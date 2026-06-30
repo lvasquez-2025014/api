@@ -28,14 +28,16 @@ app.use(express.text({ type: 'application/x-www-form-urlencoded' }));
 const seedData = async () => {
   const ownerExists = await Account.findOne({ role: 'owner' });
   if (!ownerExists) {
-    const hashed = await bcrypt.hash('admin123', 10);
+    const ownerUser = process.env.OWNER_USERNAME || 'owner';
+    const ownerPass = process.env.OWNER_PASSWORD || 'admin123';
+    const hashed = await bcrypt.hash(ownerPass, 10);
     await Account.create({
-      username: 'owner',
-      email: 'owner@keyauth.local',
+      username: ownerUser,
+      email: `${ownerUser}@oficialauth.local`,
       password: hashed,
       role: 'owner',
     });
-    console.log('Default owner created: owner / admin123');
+    console.log(`Default owner created: ${ownerUser}`);
   }
 };
 

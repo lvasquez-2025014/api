@@ -117,12 +117,6 @@ export default function LoginPage() {
             {isRegister ? "Already have an account? Sign in" : "Don't have an account? Register"}
           </button>
         </div>
-
-        <div className="mt-4 rounded-lg border border-white/5 bg-white/5 p-3">
-          <p className="text-center text-xs text-zinc-600">
-            Default owner: <span className="text-zinc-400">owner</span> / <span className="text-zinc-400">admin123</span>
-          </p>
-        </div>
       </div>
     </div>
   );
