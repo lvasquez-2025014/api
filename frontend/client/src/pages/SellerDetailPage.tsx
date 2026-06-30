@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRoute, useLocation } from "wouter";
+import { API_URL } from "../lib/authApi";
 
 type IconName = "apps" | "license" | "users" | "token" | "sub" | "chat" | "session" | "webhook" | "file" | "variable" | "settings" | "eye" | "eyeOff" | "copy" | "search" | "plus" | "filter" | "chevron" | "check" | "ban" | "trash" | "edit" | "pause" | "play" | "logo" | "refresh" | "x" | "save" | "key" | "shield" | "clock" | "download" | "upload" | "link" | "zap" | "activity" | "terminal" | "database" | "globe" | "lock" | "unlock" | "arrowLeft" | "info" | "resources";
 
@@ -110,7 +111,9 @@ const CredentialRow = ({ label, value, showCopy = true }: { label: string; value
   );
 };
 
-const CODE_URL = "https://oficialauth.win/api/1.0";
+const CODE_URL = (import.meta as any).env?.VITE_API_URL
+  ? `${(import.meta as any).env.VITE_API_URL}/api/1.0`
+  : "http://localhost:3001/api/1.0";
 
 function getCodeSnippet(lang: string, app: any): string {
   const n = app.name, o = app.ownerId, v = app.version, s = app.secret;
@@ -302,7 +305,7 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
 
   const fetchLicenses = useCallback(async () => {
     try {
-      const res = await fetch(`/api/v1/seller/licenses?page=1&limit=200`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/seller/licenses?page=1&limit=200`, { headers });
       const data = await res.json();
       setLicenses(data.licenses || []);
     } catch (err) { console.error(err); }
@@ -314,7 +317,7 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
   const handleGenerate = async () => {
     setGenerating(true);
     try {
-      const res = await fetch(`/api/v1/seller/licenses/generate`, {
+      const res = await fetch(`${API_URL}/api/v1/seller/licenses/generate`, {
         method: "POST", headers,
         body: JSON.stringify({ count, durationDays: duration, subLevel }),
       });
@@ -325,7 +328,7 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`/api/v1/seller/licenses/${id}`, { method: "DELETE", headers });
+      await fetch(`${API_URL}/api/v1/seller/licenses/${id}`, { method: "DELETE", headers });
       setLicenses(prev => prev.filter(l => l._id !== id));
     } catch (err) { console.error(err); }
   };
@@ -407,7 +410,7 @@ const UsersView = ({ app, token }: { app: any; token: string }) => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch(`/api/v1/seller/users?search=&page=1&limit=200`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/seller/users?search=&page=1&limit=200`, { headers });
       const data = await res.json();
       setUsers(data.users || []);
     } catch (err) { console.error(err); }
@@ -418,14 +421,14 @@ const UsersView = ({ app, token }: { app: any; token: string }) => {
 
   const handleBan = async (userId: string) => {
     try {
-      await fetch(`/api/v1/seller/users/${userId}/ban`, { method: "POST", headers });
+      await fetch(`${API_URL}/api/v1/seller/users/${userId}/ban`, { method: "POST", headers });
       fetchUsers();
     } catch (err) { console.error(err); }
   };
 
   const handleDelete = async (userId: string) => {
     try {
-      await fetch(`/api/v1/seller/users/${userId}`, { method: "DELETE", headers });
+      await fetch(`${API_URL}/api/v1/seller/users/${userId}`, { method: "DELETE", headers });
       setUsers(prev => prev.filter(u => u._id !== userId));
     } catch (err) { console.error(err); }
   };
@@ -501,7 +504,7 @@ export default function SellerDetailPage() {
   const fetchApp = useCallback(async () => {
     if (!sellerId) return;
     try {
-      const res = await fetch(`/api/v1/seller-management/${sellerId}/app`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/v1/seller-management/${sellerId}/app`, { headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) { const data = await res.json(); setApp(data.app); }
     } catch (err) { console.error(err); }
     setLoading(false);
@@ -513,7 +516,7 @@ export default function SellerDetailPage() {
     if (!appName.trim()) { setError("App name is required"); return; }
     setCreating(true); setError("");
     try {
-      const res = await fetch(`/api/v1/seller-management/${sellerId}/app`, {
+      const res = await fetch(`${API_URL}/api/v1/seller-management/${sellerId}/app`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ name: appName.trim() }),

@@ -7,7 +7,7 @@ export interface AuthRequest extends Request {
   user?: { id: string; username: string; role: 'owner' | 'seller' };
 }
 
-export const generateToken = (payload: { id: string; username: string; role: string }) => {
+export const generateToken = (payload: { id: string; username: string; role: 'owner' | 'seller' }) => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 };
 
@@ -17,7 +17,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     return res.status(401).json({ message: 'No token provided' });
   }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; username: string; role: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; username: string; role: 'owner' | 'seller' };
     req.user = decoded;
     next();
   } catch {

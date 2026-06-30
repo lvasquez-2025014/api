@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
+import { API_URL } from "../lib/authApi";
 
 type IconName = "apps" | "license" | "users" | "token" | "sub" | "chat" | "session" | "webhook" | "file" | "variable" | "settings" | "eye" | "eyeOff" | "copy" | "search" | "plus" | "filter" | "chevron" | "check" | "ban" | "trash" | "edit" | "pause" | "play" | "logo" | "refresh" | "x" | "save" | "key" | "shield" | "clock" | "download" | "upload" | "link" | "zap" | "activity" | "terminal" | "database" | "globe" | "lock" | "unlock" | "arrowLeft";
 
@@ -122,7 +123,7 @@ export default function KeyAuthDashboard() {
 
   const fetchSellers = useCallback(async () => {
     try {
-      const res = await fetch("/api/v1/seller-management", { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/v1/seller-management`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       setSellers(data.sellers || []);
     } catch (err) { console.error(err); }
@@ -135,7 +136,7 @@ export default function KeyAuthDashboard() {
     if (!newUsername.trim() || !newEmail.trim() || !newPassword.trim()) { setError("All fields are required"); return; }
     setCreating(true); setError("");
     try {
-      const res = await fetch("/api/v1/seller-management", {
+      const res = await fetch(`${API_URL}/api/v1/seller-management`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ username: newUsername.trim(), email: newEmail.trim(), password: newPassword }),
@@ -152,7 +153,7 @@ export default function KeyAuthDashboard() {
     e.stopPropagation();
     if (!window.confirm(`Delete seller "${seller.username}" and their app?`)) return;
     try {
-      await fetch(`/api/v1/seller-management/${seller._id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      await fetch(`${API_URL}/api/v1/seller-management/${seller._id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
       setSellers(prev => prev.filter(s => s._id !== seller._id));
     } catch (err) { console.error(err); }
   };

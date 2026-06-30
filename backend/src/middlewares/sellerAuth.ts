@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { applications, Application } from '../utils/mockDb';
+import { applications } from '../utils/mockDb';
+import { Application } from '../models/Application';
 import { App } from '../models/App';
-import { generateUniqueId } from '../utils/utils';
+
+interface AuthRequest extends Request {
+  authApp?: Application;
+}
 
 export const sellerAuth = async (req: Request, res: Response, next: NextFunction) => {
   const ownerId = req.headers['x-owner-id'] as string;
@@ -34,6 +38,6 @@ export const sellerAuth = async (req: Request, res: Response, next: NextFunction
     return res.status(401).json({ message: 'Authentication failed: Invalid owner ID or secret.' });
   }
 
-  req.authApp = app;
+  (req as AuthRequest).authApp = app;
   next();
 };
