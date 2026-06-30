@@ -582,11 +582,11 @@ namespace KeyAuth {
 				WINHTTP_NO_PROXY_BYPASS, 0);
 			if (!hSession) return "null";
 
-			HINTERNET hConnect = WinHttpConnect(hSession, L"localhost", 3001, 0);
+			HINTERNET hConnect = WinHttpConnect(hSession, L"oficial-auth-backend.onrender.com", 443, 0);
 			if (!hConnect) { WinHttpCloseHandle(hSession); return "null"; }
 
 			HINTERNET hRequest = WinHttpOpenRequest(hConnect, L"POST", L"/api/1.0",
-				nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
+				nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
 			if (!hRequest) { WinHttpCloseHandle(hConnect); WinHttpCloseHandle(hSession); return "null"; }
 
 			const wchar_t* headers = L"Content-Type: application/x-www-form-urlencoded";
