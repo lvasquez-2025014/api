@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { Account } from '../models/Account';
-import { generateToken } from '../middlewares/auth';
+import { generateToken, authMiddleware, AuthRequest } from '../middlewares/auth';
 
 const router = Router();
 
@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
     const token = generateToken({ id: account._id.toString(), username: account.username, role: account.role });
     res.json({ token, user: { id: account._id, username: account.username, email: account.email, role: account.role } });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
@@ -47,19 +47,13 @@ router.post('/login', async (req, res) => {
     const token = generateToken({ id: account._id.toString(), username: account.username, role: account.role });
     res.json({ token, user: { id: account._id, username: account.username, email: account.email, role: account.role } });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-router.get('/me', async (req: any, res) => {
+router.get('/me', authMiddleware, async (req: any, res) => {
   try {
-    const { authMiddleware } = await import('../middlewares/auth');
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ message: 'No token' });
-
-    const jwt = await import('jsonwebtoken');
-    const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'keyauth_clone_secret_2024') as any;
-    const account = await Account.findById(decoded.id).select('-password');
+    const account = await Account.findById(req.user?.id).select('-password');
     if (!account) return res.status(404).json({ message: 'User not found' });
     res.json({ user: account });
   } catch {

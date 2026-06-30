@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'keyauth_clone_secret_2024';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev_only_secret');
 
 export interface AuthRequest extends Request {
   user?: { id: string; username: string; role: 'owner' | 'seller' };

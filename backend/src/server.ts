@@ -1,6 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 import bcrypt from 'bcryptjs';
 import { connectDB } from './config/mongo';
 import { Account } from './models/Account';
@@ -21,11 +24,46 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://api-frontend-navy.vercel.app';
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? [FRONTEND_URL, 'https://api-frontend-navy.vercel.app']
+    : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Owner-Id', 'X-Secret'],
+  credentials: true,
+}));
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many requests, please try again later.' },
+});
+app.use(globalLimiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many login attempts, please try again later.' },
+});
+
+app.use(mongoSanitize());
+
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.text({ type: 'application/x-www-form-urlencoded' }));
+
+app.use((req, res, next) => {
+  res.removeHeader('X-Powered-By');
+  next();
+});
 
 const seedData = async () => {
   const ownerExists = await Account.findOne({ role: 'owner' });
@@ -39,7 +77,6 @@ const seedData = async () => {
       password: hashed,
       role: 'owner',
     });
-    console.log(`Default owner created: ${ownerUser}`);
   }
 };
 
@@ -58,7 +95,6 @@ const loadAppsFromMongo = async () => {
       });
     }
   }
-  console.log(`Loaded ${applications.length} apps into memory from MongoDB`);
 };
 
 const start = async () => {
@@ -66,30 +102,29 @@ const start = async () => {
   await seedData();
   await loadAppsFromMongo();
 
-  // Routes
-  app.use('/api/auth', authRoutes);
+  app.use('/api/auth', authLimiter, authRoutes);
   app.use('/api/apps', appRoutes);
   app.use('/api/1.0', keyauthRoutes);
   app.use('/api/v1/seller', sellerRoutes);
   app.use('/api/v1/seller-management', sellerManagementRoutes);
-  app.use('/api/v1/client', clientRoutes);
+  app.use('/api/v1/client', authLimiter, clientRoutes);
   app.use('/api/v1/bans', banRoutes);
 
   app.get('/api/v1/ban-check', banCheck, (req, res) => {
     res.json({ banned: false });
   });
 
+  app.use((req, res) => {
+    res.status(404).json({ message: 'Not found' });
+  });
+
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('Unhandled error');
+    res.status(500).json({ message: 'Internal server error' });
+  });
+
   app.listen(PORT, () => {
-    console.log(`\n=== Server running on port ${PORT} ===`);
-    console.log(`Auth API:    http://localhost:${PORT}/api/auth`);
-    console.log(`Apps API:    http://localhost:${PORT}/api/apps`);
-    console.log(`KeyAuth API: http://localhost:${PORT}/api/1.0`);
-    console.log(`Seller API:  http://localhost:${PORT}/api/v1/seller`);
-    console.log(`Client API:  http://localhost:${PORT}/api/v1/client`);
-    if (process.env.NODE_ENV === 'production') {
-      console.log(`Frontend:    http://localhost:${PORT}`);
-    }
-    console.log('');
+    console.log(`Server running on port ${PORT}`);
   });
 };
 
