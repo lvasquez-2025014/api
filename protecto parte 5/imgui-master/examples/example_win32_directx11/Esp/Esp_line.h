@@ -1,6 +1,4 @@
-﻿
-
-#include "vector.h"
+﻿#include "vector.h"
 #include "adb.h"
 
 #include <imgui_internal.h>

@@ -81,12 +81,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
-    <ExternalIncludePath>C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\SDK\Include;C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\MinHook\include;C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\Freetype\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\SDK\Include;C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\MinHook\include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\SDK\Lib\x64;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
-    <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,7 +147,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib;crypt32.lib;winmm.lib;iphlpapi.lib;secur32.lib;normaliz.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>bcrypt.lib;winhttp.lib;rpcrt4.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
     </Link>

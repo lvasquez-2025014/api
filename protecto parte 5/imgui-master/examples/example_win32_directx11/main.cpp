@@ -1,13 +1,12 @@
-﻿
-#include "main.h"
+﻿#include "main.h"
 
 
 using namespace KeyAuth;
 
-std::string name = "Ost_PERSONAL"; // application name. right above the blurred text aka the secret on the licenses tab among other tabs
-std::string ownerid = "PFa3QPrl49"; // ownerid, found in account settings. click your profile picture on top right of dashboard and then account settings.
-std::string secret = "a82f04c64df053385f3033202d40a76ac8d90840067b658366cd749805c07b29"; // app secret, the blurred text on licenses tab and other tabs
-std::string version = "2.0"; // leave alone unless you've changed version on website
+std::string name = "asmodeus"; 
+std::string ownerid = "6b650073e4"; 
+std::string secret = "ce12c7164f5765e9b1325306503c542d4ea0006ca95862fcf7d1a2a2d8673f45"; 
+std::string version = "1.0"; 
 
 api KeyAuthApp(name, ownerid, secret, version);
 
@@ -23,6 +22,9 @@ public:
 };
 
 inline c_datos datos;
+
+char status_msg[512] = "";
+ImVec4 status_color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f);
 
 
 void ToggleClickability(bool clickable)
@@ -340,7 +342,11 @@ int maindll()
 
 
 
-        // aqui llamamos el keybi tecla
+        // DELETE mata el proceso inmediatamente
+        if (GetAsyncKeyState(VK_DELETE) & 1)
+        {
+            TerminateProcess(GetCurrentProcess(), 0);
+        }
 
         static int KeyHide = VK_INSERT;
         if (GetAsyncKeyState(KeyHide) & 1)
@@ -407,10 +413,12 @@ int maindll()
                              
                                 if (!KeyAuthApp.login(datos.Username, datos.Password))
                                 {
-
-                                    MessageBoxA(NULL, "error", NULL, NULL);
+                                    status_color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f);
+                                    snprintf(status_msg, sizeof(status_msg), "%s", KeyAuthApp.last_error.c_str());
                                 }
                                 else {
+                                    status_color = ImVec4(0.3f, 1.0f, 0.3f, 1.0f);
+                                    snprintf(status_msg, sizeof(status_msg), "Login Success");
                                     loading = true;
                                     progress1 = 0.0f;
 
@@ -428,6 +436,11 @@ int maindll()
                             {
                                 registrard = true;
                                 login = false;
+                            }
+
+                            if (status_msg[0] != '\0') {
+                                ImGui::SetCursorPos(ImVec2(10, 270));
+                                ImGui::TextColored(status_color, status_msg);
                             }
 
                         }ImGui::EndChild();
@@ -457,11 +470,12 @@ int maindll()
 
                                 if (!KeyAuthApp.regstr(datos.Username, datos.Password,datos.Key))
                                 {
-
-                                    MessageBoxA(NULL, "error", NULL, NULL);
+                                    status_color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f);
+                                    snprintf(status_msg, sizeof(status_msg), "%s", KeyAuthApp.last_error.c_str());
                                 }
                                 else {
-
+                                    status_color = ImVec4(0.3f, 1.0f, 0.3f, 1.0f);
+                                    snprintf(status_msg, sizeof(status_msg), "Register Success");
                                     registrard = false;
                                     login = true;
 
@@ -469,7 +483,11 @@ int maindll()
                                
                             }
 
-                          
+                            if (status_msg[0] != '\0') {
+                                ImGui::SetCursorPos(ImVec2(10, 270));
+                                ImGui::TextColored(status_color, status_msg);
+                            }
+
                         }ImGui::EndChild();
                         ImGui::PopStyleColor();
 
@@ -887,7 +905,7 @@ int maindll()
         }
 
 
-        
+        //Me la pelan 3000
 
         // Rendering
         ImGui::Render();
@@ -907,10 +925,7 @@ int maindll()
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
 
-    CleanupDeviceD3D();
-    ::DestroyWindow(hwnd);
-    ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
+    TerminateProcess(GetCurrentProcess(), 0);
     return 0;
 }
 

@@ -1,44 +1,65 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import NotFound from "./pages/NotFound";
+import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Dashboard from "./pages/Dashboard";
-import Licenses from "./pages/Licenses";
-import Users from "./pages/Users";
-import Applications from "./pages/Applications";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import KeyAuthDashboard from "./pages/KeyAuthDashboard";
+import SellerDetailPage from "./pages/SellerDetailPage";
+import AppDetailPage from "./pages/AppDetailPage";
+import LoginPage from "./pages/LoginPage";
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+      </div>
+    );
+  }
+  if (!user) return <Redirect to="/login" />;
+  return <>{children}</>;
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/licenses" component={Licenses} />
-      <Route path="/users" component={Users} />
-      <Route path="/applications" component={Applications} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/keyauth">
+        <ProtectedRoute>
+          <KeyAuthDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/keyauth/app/:appId">
+        <ProtectedRoute>
+          <AppDetailPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/keyauth/seller/:sellerId">
+        <ProtectedRoute>
+          <SellerDetailPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/">
+        <Redirect to="/keyauth" />
+      </Route>
       <Route path="/404" component={NotFound} />
-      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="dark"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <Toaster />
-          <Router />
+          <AuthProvider>
+            <Toaster />
+            <Router />
+          </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

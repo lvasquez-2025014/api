@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "vector.h"
 #include "lib.h"
-#include "C:\Users\joel\Desktop\imgui-master\examples\example_win32_directx11\MinHook\include\MinHook.h"
+#include "C:\Users\dev\Desktop\keyauth-integrated\protecto parte 5\imgui-master\MinHook\include\MinHook.h"
 #include "offset.h"
 DWORD GetProcZ(const char* processName)
 {
