@@ -5,6 +5,7 @@ import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import DevToolsGuard from "./components/DevToolsGuard";
 import KeyAuthDashboard from "./pages/KeyAuthDashboard";
 import SellerDetailPage from "./pages/SellerDetailPage";
 import AppDetailPage from "./pages/AppDetailPage";
@@ -58,7 +59,9 @@ function App() {
         <TooltipProvider>
           <AuthProvider>
             <Toaster />
-            <Router />
+            <DevToolsGuard>
+              <Router />
+            </DevToolsGuard>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>

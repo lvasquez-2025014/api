@@ -11,6 +11,8 @@ import sellerRoutes from './routes/sellerRoutes';
 import sellerManagementRoutes from './routes/sellerManagementRoutes';
 import clientRoutes from './routes/clientRoutes';
 import keyauthRoutes from './routes/keyauthRoutes';
+import banRoutes from './routes/banRoutes';
+import { banCheck } from './middlewares/banCheck';
 import { applications } from './utils/mockDb';
 import { generateUniqueId } from './utils/utils';
 import { Application } from './models';
@@ -71,6 +73,11 @@ const start = async () => {
   app.use('/api/v1/seller', sellerRoutes);
   app.use('/api/v1/seller-management', sellerManagementRoutes);
   app.use('/api/v1/client', clientRoutes);
+  app.use('/api/v1/bans', banRoutes);
+
+  app.get('/api/v1/ban-check', banCheck, (req, res) => {
+    res.json({ banned: false });
+  });
 
   app.listen(PORT, () => {
     console.log(`\n=== Server running on port ${PORT} ===`);

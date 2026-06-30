@@ -1,10 +1,4 @@
 #pragma once
-
-// =============================================================================
-// KeyAuth SDK - Zero external dependencies
-// Uses only Windows built-in APIs: BCrypt (AES/SHA256), WinHTTP, WinReg
-// =============================================================================
-
 #include <windows.h>
 #include <bcrypt.h>
 #include <winhttp.h>
@@ -26,7 +20,6 @@
 
 namespace KeyAuth {
 
-	// ─── Simple JSON parser (no external lib) ───────────────────────
 	class simple_json {
 	public:
 		static simple_json parse(const std::string& str) {
@@ -288,7 +281,7 @@ namespace KeyAuth {
 
 			auto data =
 				XorStr("type=").c_str() + encryption::encode(XorStr("init").c_str()) +
-				XorStr("&ver=").c_str() + encryption::encrypt(version, secret, iv) +
+				XorStr("&ver=").c_str() + encryption::encrypt(version, secret, iv) +	
 				XorStr("&enckey=").c_str() + encryption::encrypt(enckey, secret, iv) +
 				XorStr("&name=").c_str() + encryption::encode(name) +
 				XorStr("&ownerid=").c_str() + encryption::encode(ownerid) +
