@@ -6,25 +6,7 @@ import { generateToken, authMiddleware, AuthRequest } from '../middlewares/auth'
 const router = Router();
 
 router.post('/register', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const existing = await Account.findOne({ $or: [{ username }, { email }] });
-    if (existing) {
-      return res.status(400).json({ message: 'Username or email already exists' });
-    }
-
-    const hashed = await bcrypt.hash(password, 10);
-    const account = await Account.create({ username, email, password: hashed, role: 'seller' });
-
-    const token = generateToken({ id: account._id.toString(), username: account.username, role: account.role });
-    res.json({ token, user: { id: account._id, username: account.username, email: account.email, role: account.role } });
-  } catch (err: any) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
+  res.status(403).json({ message: 'Registration is disabled' });
 });
 
 router.post('/login', async (req, res) => {

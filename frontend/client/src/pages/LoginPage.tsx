@@ -3,11 +3,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "wouter";
 
 export default function LoginPage() {
-  const { login, register, user } = useAuth();
+  const { login, user } = useAuth();
   const [, setLocation] = useLocation();
-  const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,11 +20,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      if (isRegister) {
-        await register(username, email, password);
-      } else {
-        await login(username, password);
-      }
+      await login(username, password);
       setLocation("/");
     } catch (err: any) {
       setError(err.message);
@@ -50,9 +44,7 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white">Oficial Auth</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            {isRegister ? "Create your account" : "Sign in to your account"}
-          </p>
+          <p className="mt-1 text-sm text-zinc-500">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,20 +59,6 @@ export default function LoginPage() {
               required
             />
           </div>
-
-          {isRegister && (
-            <div>
-              <label className="mb-1 block text-xs font-medium text-zinc-400">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50"
-                placeholder="Enter email"
-                required
-              />
-            </div>
-          )}
 
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-400">Password</label>
@@ -105,18 +83,9 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/20 transition-all hover:shadow-blue-500/40 disabled:opacity-50"
           >
-            {loading ? "Loading..." : isRegister ? "Create Account" : "Sign In"}
+            {loading ? "Loading..." : "Sign In"}
           </button>
         </form>
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => { setIsRegister(!isRegister); setError(""); }}
-            className="text-sm text-zinc-500 transition-colors hover:text-white"
-          >
-            {isRegister ? "Already have an account? Sign in" : "Don't have an account? Register"}
-          </button>
-        </div>
       </div>
     </div>
   );
