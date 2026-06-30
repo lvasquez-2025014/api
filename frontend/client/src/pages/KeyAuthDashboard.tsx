@@ -220,13 +220,13 @@ export default function KeyAuthDashboard() {
   }
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-zinc-950 text-white antialiased" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="flex h-screen w-full overflow-hidden bg-zinc-950 text-white antialiased" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px]" />
         <div className="absolute top-1/2 -right-40 h-96 w-96 rounded-full bg-purple-500/10 blur-[120px]" />
       </div>
-      <div className="relative flex w-full">
-        <aside className="flex h-full w-64 flex-col border-r border-white/5 bg-zinc-950/80 backdrop-blur-xl">
+      <div className="relative flex w-full h-full">
+        <aside className="flex h-full w-64 flex-col border-r border-white/5 bg-zinc-950/80 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-3 border-b border-white/5 px-5 py-5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 text-white shadow-lg shadow-blue-500/30">
               <Icon name="logo" className="w-5 h-5" />
@@ -248,7 +248,7 @@ export default function KeyAuthDashboard() {
               {bans.length > 0 && <span className="ml-auto rounded-full bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold text-red-400">{bans.length}</span>}
             </button>
           </nav>
-          <div className="border-t border-white/5 p-4">
+          <div className="shrink-0 border-t border-white/5 p-4">
             <div className="rounded-lg bg-zinc-900/60 p-3 text-xs space-y-1 mb-3">
               <div className="flex justify-between"><span className="text-zinc-500">Sellers</span><span className="text-white font-bold">{sellers.length}</span></div>
               <div className="flex justify-between"><span className="text-zinc-500">Banned IPs</span><span className="text-red-400 font-bold">{bans.length}</span></div>
