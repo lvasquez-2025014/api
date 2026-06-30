@@ -3,7 +3,7 @@ import { sellerAuth } from '../middlewares/sellerAuth';
 import {
   getApps, createApp, updateApp, deleteApp,
   generateLicenses, getLicenses, deleteLicense,
-  getUsers, banUser, deleteUser,
+  getUsers, createUser, banUser, deleteUser,
   getTokens, revokeToken,
   getSubscriptions, createSubscription, deleteSubscription,
   getLogs, deleteLogs,
@@ -30,6 +30,7 @@ router.delete('/licenses/:id', sellerAuth, deleteLicense);
 
 // Users
 router.get('/users', sellerAuth, getUsers);
+router.post('/users', sellerAuth, createUser);
 router.post('/users/:id/ban', sellerAuth, banUser);
 router.delete('/users/:id', sellerAuth, deleteUser);
 

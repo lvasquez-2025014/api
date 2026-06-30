@@ -160,6 +160,42 @@ export const deleteLicense = async (req: Request, res: Response) => {
   }
 };
 
+export const createUser = async (req: Request, res: Response) => {
+  const app = (req as AuthRequest).authApp;
+  if (!app) return res.status(401).json({ message: 'Application not authenticated.' });
+
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required.' });
+  }
+
+  try {
+    const existing = await MongoUser.findOne({ username, appId: app.ownerId });
+    if (existing) return res.status(409).json({ message: 'User already exists.' });
+
+    const bcryptjs = require('bcryptjs');
+    const hashedPassword = await bcryptjs.hash(password, 10);
+
+    const newUser = await MongoUser.create({
+      username,
+      password: hashedPassword,
+      hwid: undefined,
+      ip: '',
+      lastLogin: new Date(),
+      status: 'Active',
+      appId: app.ownerId,
+    });
+
+    res.status(201).json({ message: 'User created.', user: {
+      id: (newUser._id as any).toString(),
+      username: newUser.username,
+      status: newUser.status,
+    }});
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const getUsers = async (req: Request, res: Response) => {
   const app = (req as AuthRequest).authApp;
   if (!app) return res.status(401).json({ message: 'Application not authenticated.' });
