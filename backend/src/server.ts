@@ -1,7 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import path from 'path';
 import bcrypt from 'bcryptjs';
 import { connectDB } from './config/mongo';
 import { Account } from './models/Account';
@@ -70,13 +69,6 @@ const start = async () => {
   app.use('/api/v1/seller', sellerRoutes);
   app.use('/api/v1/seller-management', sellerManagementRoutes);
   app.use('/api/v1/client', clientRoutes);
-
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../../frontend/dist/public')));
-    app.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, '../../frontend/dist/public', 'index.html'));
-    });
-  }
 
   app.listen(PORT, () => {
     console.log(`\n=== Server running on port ${PORT} ===`);
