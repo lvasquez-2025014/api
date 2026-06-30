@@ -379,6 +379,9 @@ export default function KeyAuthDashboard() {
             </>
             )}
           </div>
+          <div className="border-t border-white/5 px-6 py-4 text-center">
+            <p className="text-[11px] text-zinc-600">&copy; {new Date().getFullYear()} Oficial Auth &mdash; Developer <span className="text-zinc-400 font-semibold">Asmodeus</span></p>
+          </div>
         </main>
       </div>
     </div>
