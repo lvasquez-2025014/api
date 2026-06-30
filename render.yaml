@@ -3,8 +3,8 @@ services:
     name: oficial-auth-backend
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: pnpm install && pnpm run build
+    startCommand: pnpm start
     envVars:
       - key: MONGODB_URI
         sync: false
