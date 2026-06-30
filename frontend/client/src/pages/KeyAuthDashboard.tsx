@@ -126,28 +126,26 @@ export default function KeyAuthDashboard() {
   const [banIpInput, setBanIpInput] = useState("");
   const { logout } = useAuth();
 
-  const token = localStorage.getItem("token");
-
   const fetchSellers = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/seller-management`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/v1/seller-management`, { credentials: 'include' });
       const data = await res.json();
       setSellers(data.sellers || []);
     } catch (err) { console.error(err); }
     setLoading(false);
-  }, [token]);
+  }, []);
 
   useEffect(() => { fetchSellers(); }, [fetchSellers]);
 
   const fetchBans = useCallback(async () => {
     setBansLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/bans`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/v1/bans`, { credentials: 'include' });
       const data = await res.json();
       setBans(Array.isArray(data) ? data : []);
     } catch { }
     setBansLoading(false);
-  }, [token]);
+  }, []);
 
   useEffect(() => { if (activeTab === "bans") fetchBans(); }, [activeTab, fetchBans]);
 
@@ -155,7 +153,7 @@ export default function KeyAuthDashboard() {
     try {
       await fetch(`${API_URL}/api/v1/bans/unban`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: JSON.stringify({ ip }),
       });
       setBans(prev => prev.filter(b => b.ip !== ip));
@@ -167,7 +165,8 @@ export default function KeyAuthDashboard() {
     try {
       const res = await fetch(`${API_URL}/api/v1/bans/ban`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ ip: banIpInput.trim(), reason: "Manually banned by owner" }),
       });
       if (res.ok) {
@@ -183,7 +182,7 @@ export default function KeyAuthDashboard() {
     try {
       const res = await fetch(`${API_URL}/api/v1/seller-management`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: JSON.stringify({ username: newUsername.trim(), email: newEmail.trim(), password: newPassword }),
       });
       const data = await res.json();
@@ -198,7 +197,7 @@ export default function KeyAuthDashboard() {
     e.stopPropagation();
     if (!window.confirm(`Delete seller "${seller.username}" and their app?`)) return;
     try {
-      await fetch(`${API_URL}/api/v1/seller-management/${seller._id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      await fetch(`${API_URL}/api/v1/seller-management/${seller._id}`, { method: "DELETE", credentials: 'include' });
       setSellers(prev => prev.filter(s => s._id !== seller._id));
     } catch (err) { console.error(err); }
   };

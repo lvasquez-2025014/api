@@ -1,13 +1,9 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { Account } from '../models/Account';
-import { generateToken, authMiddleware, AuthRequest } from '../middlewares/auth';
+import { generateToken, authMiddleware, AuthRequest, setTokenCookie, clearTokenCookie } from '../middlewares/auth';
 
 const router = Router();
-
-router.post('/register', async (req, res) => {
-  res.status(403).json({ message: 'Registration is disabled' });
-});
 
 router.post('/login', async (req, res) => {
   try {
@@ -26,11 +22,17 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = generateToken({ id: account._id.toString(), username: account.username, role: account.role });
-    res.json({ token, user: { id: account._id, username: account.username, email: account.email, role: account.role } });
+    const token = generateToken({ id: account._id.toString(), username: account.username, role: account.role as 'owner' | 'seller' });
+    setTokenCookie(res, token);
+    res.json({ user: { id: account._id, username: account.username, email: account.email, role: account.role } });
   } catch (err: any) {
     res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+router.post('/logout', (req, res) => {
+  clearTokenCookie(res);
+  res.json({ message: 'Logged out' });
 });
 
 router.get('/me', authMiddleware, async (req: any, res) => {

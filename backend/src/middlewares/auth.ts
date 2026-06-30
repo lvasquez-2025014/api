@@ -11,8 +11,32 @@ export const generateToken = (payload: { id: string; username: string; role: 'ow
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 };
 
+export const setTokenCookie = (res: Response, token: string) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/',
+  });
+};
+
+export const clearTokenCookie = (res: Response) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.cookie('token', '', {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 0,
+    path: '/',
+  });
+};
+
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token = req.cookies?.token
+    || req.headers.authorization?.replace('Bearer ', '');
+
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
   }

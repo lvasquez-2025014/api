@@ -292,7 +292,7 @@ const sidebarLinks = [
   { id: "settings", label: "Settings", icon: "settings" as IconName },
 ];
 
-const LicensesView = ({ app, token }: { app: any; token: string }) => {
+const LicensesView = ({ app }: { app: any }) => {
   const [licenses, setLicenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(5);
@@ -302,10 +302,11 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const headers = { "X-Owner-Id": app.ownerId, "X-Secret": app.secret, "Content-Type": "application/json" };
+  const fetchOpts = { headers, credentials: 'include' as const };
 
   const fetchLicenses = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/seller/licenses?page=1&limit=200`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/seller/licenses?page=1&limit=200`, fetchOpts);
       const data = await res.json();
       setLicenses(data.licenses || []);
     } catch (err) { console.error(err); }
@@ -318,7 +319,7 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
     setGenerating(true);
     try {
       const res = await fetch(`${API_URL}/api/v1/seller/licenses/generate`, {
-        method: "POST", headers,
+        method: "POST", ...fetchOpts,
         body: JSON.stringify({ count, durationDays: duration, subLevel }),
       });
       if (res.ok) fetchLicenses();
@@ -328,7 +329,7 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`${API_URL}/api/v1/seller/licenses/${id}`, { method: "DELETE", headers });
+      await fetch(`${API_URL}/api/v1/seller/licenses/${id}`, { method: "DELETE", ...fetchOpts });
       setLicenses(prev => prev.filter(l => l._id !== id));
     } catch (err) { console.error(err); }
   };
@@ -402,7 +403,7 @@ const LicensesView = ({ app, token }: { app: any; token: string }) => {
   );
 };
 
-const UsersView = ({ app, token }: { app: any; token: string }) => {
+const UsersView = ({ app }: { app: any }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -412,10 +413,11 @@ const UsersView = ({ app, token }: { app: any; token: string }) => {
   const [error, setError] = useState("");
 
   const headers = { "X-Owner-Id": app.ownerId, "X-Secret": app.secret, "Content-Type": "application/json" };
+  const fetchOpts = { headers, credentials: 'include' as const };
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/seller/users?search=&page=1&limit=200`, { headers });
+      const res = await fetch(`${API_URL}/api/v1/seller/users?search=&page=1&limit=200`, fetchOpts);
       const data = await res.json();
       setUsers(data.users || []);
     } catch (err) { console.error(err); }
@@ -429,7 +431,7 @@ const UsersView = ({ app, token }: { app: any; token: string }) => {
     setCreating(true); setError("");
     try {
       const res = await fetch(`${API_URL}/api/v1/seller/users`, {
-        method: "POST", headers,
+        method: "POST", ...fetchOpts,
         body: JSON.stringify({ username: newUsername.trim(), password: newPassword }),
       });
       const data = await res.json();
@@ -442,14 +444,14 @@ const UsersView = ({ app, token }: { app: any; token: string }) => {
 
   const handleBan = async (userId: string) => {
     try {
-      await fetch(`${API_URL}/api/v1/seller/users/${userId}/ban`, { method: "POST", headers });
+      await fetch(`${API_URL}/api/v1/seller/users/${userId}/ban`, { method: "POST", ...fetchOpts });
       fetchUsers();
     } catch (err) { console.error(err); }
   };
 
   const handleDelete = async (userId: string) => {
     try {
-      await fetch(`${API_URL}/api/v1/seller/users/${userId}`, { method: "DELETE", headers });
+      await fetch(`${API_URL}/api/v1/seller/users/${userId}`, { method: "DELETE", ...fetchOpts });
       setUsers(prev => prev.filter(u => u._id !== userId));
     } catch (err) { console.error(err); }
   };
@@ -536,8 +538,6 @@ export default function SellerDetailPage() {
   const [error, setError] = useState("");
   const [sidebarView, setSidebarView] = useState("manage-apps");
 
-  const token = localStorage.getItem("token");
-
   useEffect(() => {
     if (!sellerId) return;
     const stored = sessionStorage.getItem("selectedSeller");
@@ -550,11 +550,11 @@ export default function SellerDetailPage() {
   const fetchApp = useCallback(async () => {
     if (!sellerId) return;
     try {
-      const res = await fetch(`${API_URL}/api/v1/seller-management/${sellerId}/app`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/v1/seller-management/${sellerId}/app`, { credentials: 'include' });
       if (res.ok) { const data = await res.json(); setApp(data.app); }
     } catch (err) { console.error(err); }
     setLoading(false);
-  }, [sellerId, token]);
+  }, [sellerId]);
 
   useEffect(() => { fetchApp(); }, [fetchApp]);
 
@@ -564,7 +564,7 @@ export default function SellerDetailPage() {
     try {
       const res = await fetch(`${API_URL}/api/v1/seller-management/${sellerId}/app`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        credentials: 'include',
         body: JSON.stringify({ name: appName.trim() }),
       });
       const data = await res.json();
@@ -763,9 +763,9 @@ export default function SellerDetailPage() {
                 )}
               </div>
             ) : sidebarView === "licenses" ? (
-              <LicensesView app={app} token={token!} />
+              <LicensesView app={app} />
             ) : sidebarView === "users" ? (
-              <UsersView app={app} token={token!} />
+              <UsersView app={app} />
             ) : (
               <div className="flex min-h-[40vh] flex-col items-center justify-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-blue-400 border border-blue-500/20 mb-4">
