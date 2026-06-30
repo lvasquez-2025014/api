@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import { API_URL } from "../lib/authApi";
+import { useAuth } from "../contexts/AuthContext";
 
-type IconName = "apps" | "license" | "users" | "token" | "sub" | "chat" | "session" | "webhook" | "file" | "variable" | "settings" | "eye" | "eyeOff" | "copy" | "search" | "plus" | "filter" | "chevron" | "check" | "ban" | "trash" | "edit" | "pause" | "play" | "logo" | "refresh" | "x" | "save" | "key" | "shield" | "clock" | "download" | "upload" | "link" | "zap" | "activity" | "terminal" | "database" | "globe" | "lock" | "unlock" | "arrowLeft";
+type IconName = "apps" | "license" | "users" | "token" | "sub" | "chat" | "session" | "webhook" | "file" | "variable" | "settings" | "eye" | "eyeOff" | "copy" | "search" | "plus" | "filter" | "chevron" | "check" | "ban" | "trash" | "edit" | "pause" | "play" | "logo" | "refresh" | "x" | "save" | "key" | "shield" | "clock" | "download" | "upload" | "link" | "zap" | "activity" | "terminal" | "database" | "globe" | "lock" | "unlock" | "arrowLeft" | "logOut";
 
 const Icon = ({ name, className = "w-5 h-5" }: { name: IconName; className?: string }) => {
   const paths: Record<IconName, React.ReactNode> = {
@@ -48,6 +49,7 @@ const Icon = ({ name, className = "w-5 h-5" }: { name: IconName; className?: str
     lock: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></>,
     unlock: <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 019.9-1" /></>,
     arrowLeft: <><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>,
+    logOut: <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></>,
   };
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -122,6 +124,7 @@ export default function KeyAuthDashboard() {
   const [bans, setBans] = useState<any[]>([]);
   const [bansLoading, setBansLoading] = useState(false);
   const [banIpInput, setBanIpInput] = useState("");
+  const { logout } = useAuth();
 
   const token = localStorage.getItem("token");
 
@@ -246,10 +249,14 @@ export default function KeyAuthDashboard() {
             </button>
           </nav>
           <div className="border-t border-white/5 p-4">
-            <div className="rounded-lg bg-zinc-900/60 p-3 text-xs space-y-1">
+            <div className="rounded-lg bg-zinc-900/60 p-3 text-xs space-y-1 mb-3">
               <div className="flex justify-between"><span className="text-zinc-500">Sellers</span><span className="text-white font-bold">{sellers.length}</span></div>
               <div className="flex justify-between"><span className="text-zinc-500">Banned IPs</span><span className="text-red-400 font-bold">{bans.length}</span></div>
             </div>
+            <button onClick={logout} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition">
+              <Icon name="logOut" className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
           </div>
         </aside>
 
