@@ -134,7 +134,7 @@ export const getLicenses = async (req: Request, res: Response) => {
   if (!app) return res.status(401).json({ message: 'Application not authenticated.' });
 
   const appLicenses = await LicenseModel.find({ appId: app.ownerId }).lean();
-  res.status(200).json(appLicenses.map(l => ({
+  res.status(200).json({ licenses: appLicenses.map(l => ({
     id: (l._id as any).toString(),
     key: l.key,
     durationDays: l.durationDays,
@@ -143,7 +143,7 @@ export const getLicenses = async (req: Request, res: Response) => {
     hwid: l.hwid,
     expiresAt: l.expiresAt,
     appId: l.appId,
-  })));
+  })) });
 };
 
 export const deleteLicense = async (req: Request, res: Response) => {
@@ -165,7 +165,7 @@ export const getUsers = async (req: Request, res: Response) => {
   if (!app) return res.status(401).json({ message: 'Application not authenticated.' });
 
   const appUsers = await MongoUser.find({ appId: app.ownerId }).lean();
-  res.status(200).json(appUsers.map(u => ({
+  res.status(200).json({ users: appUsers.map(u => ({
     id: (u._id as any).toString(),
     username: u.username,
     ip: u.ip,
@@ -173,7 +173,7 @@ export const getUsers = async (req: Request, res: Response) => {
     hwid: u.hwid,
     status: u.status,
     appId: u.appId,
-  })));
+  })) });
 };
 
 export const banUser = async (req: Request, res: Response) => {
