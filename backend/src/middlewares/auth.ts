@@ -11,8 +11,9 @@ export const generateToken = (payload: { id: string; username: string; role: 'ow
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 };
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const setTokenCookie = (res: Response, token: string) => {
-  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie('token', token, {
     httpOnly: true,
     secure: isProduction,
@@ -23,7 +24,6 @@ export const setTokenCookie = (res: Response, token: string) => {
 };
 
 export const clearTokenCookie = (res: Response) => {
-  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie('token', '', {
     httpOnly: true,
     secure: isProduction,
