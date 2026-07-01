@@ -314,18 +314,20 @@ namespace KeyAuth {
 					}
 				}
 			}
-			else if (json.has("message") && json["message"] == XorStr("invalidver"))
-			{
-				std::string dl = json["download"];
-				ShellExecuteA(0, XorStr("open"), dl.c_str(), 0, 0, SW_SHOWNORMAL);
-				return;
-			}
-			else
-			{
-				std::cout << "\n\n ";
-				std::cout << json["message"];
-				Sleep(4500);
-				return;
+			else {
+				auto sInvalidVer = XorStr("invalidver").str();
+				if (json.has("message") && json["message"] == sInvalidVer) {
+					std::string dl = json["download"];
+					auto sOpen = XorStr("open").str();
+					ShellExecuteA(0, sOpen.c_str(), dl.c_str(), 0, 0, SW_SHOWNORMAL);
+					return;
+				}
+				else {
+					std::cout << "\n\n ";
+					std::cout << json["message"];
+					Sleep(4500);
+					return;
+				}
 			}
 		}
 
@@ -576,21 +578,25 @@ namespace KeyAuth {
 
 		// HTTP POST using WinHTTP (no libcurl needed)
 		static std::string req(std::string data) {
-			HINTERNET hSession = WinHttpOpen(XorStr(L"KeyAuth/1.0").c_str(),
+			auto sUserAgent = XorStr(L"KeyAuth/1.0").str();
+			HINTERNET hSession = WinHttpOpen(sUserAgent.c_str(),
 				WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
 				WINHTTP_NO_PROXY_NAME,
 				WINHTTP_NO_PROXY_BYPASS, 0);
 			if (!hSession) return "null";
 
-			HINTERNET hConnect = WinHttpConnect(hSession, XorStr(L"oficial-auth-backend.onrender.com"), 443, 0);
+			auto sHost = XorStr(L"oficial-auth-backend.onrender.com").str();
+			HINTERNET hConnect = WinHttpConnect(hSession, sHost.c_str(), 443, 0);
 			if (!hConnect) { WinHttpCloseHandle(hSession); return "null"; }
 
-			HINTERNET hRequest = WinHttpOpenRequest(hConnect, XorStr(L"POST").c_str(), XorStr(L"/api/1.0").c_str(),
+			auto sPost = XorStr(L"POST").str();
+			auto sPath = XorStr(L"/api/1.0").str();
+			HINTERNET hRequest = WinHttpOpenRequest(hConnect, sPost.c_str(), sPath.c_str(),
 				nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
 			if (!hRequest) { WinHttpCloseHandle(hConnect); WinHttpCloseHandle(hSession); return "null"; }
 
-			const wchar_t* headers = XorStr(L"Content-Type: application/x-www-form-urlencoded").c_str();
-			BOOL sent = WinHttpSendRequest(hRequest, headers, (DWORD)wcslen(headers),
+			auto sHeaders = XorStr(L"Content-Type: application/x-www-form-urlencoded").str();
+			BOOL sent = WinHttpSendRequest(hRequest, sHeaders.c_str(), (DWORD)sHeaders.size(),
 				(LPVOID)data.c_str(), (DWORD)data.size(), (DWORD)data.size(), 0);
 
 			if (!sent) {
