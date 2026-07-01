@@ -71,6 +71,15 @@ app.use((req, res, next) => {
 
 const seedData = async () => {
   const ownerExists = await Account.findOne({ role: 'owner' });
+
+  if (ownerExists && !ownerExists.password.startsWith('$2a$') && !ownerExists.password.startsWith('$2b$')) {
+    console.log('Owner password is not hashed. Re-hashing...');
+    const ownerPass = process.env.OWNER_PASSWORD || 'admin123';
+    ownerExists.password = await bcrypt.hash(ownerPass, 10);
+    await ownerExists.save();
+    console.log('Owner password re-hashed successfully.');
+  }
+
   if (!ownerExists) {
     const ownerUser = process.env.OWNER_USERNAME || 'owner';
     const ownerPass = process.env.OWNER_PASSWORD || 'admin123';
