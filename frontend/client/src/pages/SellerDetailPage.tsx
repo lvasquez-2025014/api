@@ -564,6 +564,7 @@ export default function SellerDetailPage() {
     try {
       const res = await fetch(`${API_URL}/api/v1/seller-management/${sellerId}/app`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: 'include',
         body: JSON.stringify({ name: appName.trim() }),
       });

@@ -59,7 +59,7 @@ const Icon = ({ name, className = "w-5 h-5" }: { name: IconName; className?: str
 };
 
 const Btn = ({ children, onClick, variant = "default", size = "sm", className = "", disabled }: {
-  children: React.ReactNode; onClick?: () => void; variant?: "default" | "primary" | "danger" | "ghost" | "success";
+  children: React.ReactNode; onClick?: (e: any) => void; variant?: "default" | "primary" | "danger" | "ghost" | "success";
   size?: "xs" | "sm" | "md"; className?: string; disabled?: boolean;
 }) => {
   const v = {
@@ -153,6 +153,7 @@ export default function KeyAuthDashboard() {
     try {
       await fetch(`${API_URL}/api/v1/bans/unban`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: 'include',
         body: JSON.stringify({ ip }),
       });
@@ -182,6 +183,7 @@ export default function KeyAuthDashboard() {
     try {
       const res = await fetch(`${API_URL}/api/v1/seller-management`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         credentials: 'include',
         body: JSON.stringify({ username: newUsername.trim(), email: newEmail.trim(), password: newPassword }),
       });
