@@ -261,8 +261,8 @@ export default function KeyAuthDashboard() {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-7xl p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto flex flex-col">
+          <div className="mx-auto max-w-7xl w-full p-6 lg:p-8 flex-1">
             {activeTab === "sellers" && (
             <>
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -380,7 +380,7 @@ export default function KeyAuthDashboard() {
             </>
             )}
           </div>
-          <div className="border-t border-white/5 px-6 py-4 text-center">
+          <div className="sticky bottom-0 border-t border-white/5 bg-zinc-950/80 backdrop-blur-xl px-6 py-4 text-center">
             <p className="text-[11px] text-zinc-600">&copy; {new Date().getFullYear()} Oficial Auth &mdash; Developer <span className="text-zinc-400 font-semibold">Asmodeus</span></p>
           </div>
         </main>
