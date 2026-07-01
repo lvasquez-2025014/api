@@ -298,6 +298,7 @@ const LicensesView = ({ app }: { app: any }) => {
   const [count, setCount] = useState(5);
   const [duration, setDuration] = useState(30);
   const [subLevel, setSubLevel] = useState(1);
+  const [prefix, setPrefix] = useState("KEYAUTH");
   const [generating, setGenerating] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -320,7 +321,7 @@ const LicensesView = ({ app }: { app: any }) => {
     try {
       const res = await fetch(`${API_URL}/api/v1/seller/licenses/generate`, {
         method: "POST", ...fetchOpts,
-        body: JSON.stringify({ count, durationDays: duration, subLevel }),
+        body: JSON.stringify({ count, durationDays: duration, subLevel, prefix }),
       });
       if (res.ok) fetchLicenses();
     } catch (err) { console.error(err); }
@@ -348,6 +349,11 @@ const LicensesView = ({ app }: { app: any }) => {
       <div className="mb-6 rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
         <h3 className="mb-4 text-sm font-bold text-white">Generate Licenses</h3>
         <div className="flex flex-wrap items-end gap-3">
+          <div>
+            <label className="mb-1 block text-[10px] uppercase tracking-widest text-zinc-500">Prefix</label>
+            <input type="text" value={prefix} onChange={e => setPrefix(e.target.value)} placeholder="KEYAUTH"
+              className="w-32 rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
+          </div>
           <div>
             <label className="mb-1 block text-[10px] uppercase tracking-widest text-zinc-500">Count</label>
             <input type="number" value={count} onChange={e => setCount(Number(e.target.value))} min={1} max={100}

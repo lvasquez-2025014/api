@@ -294,6 +294,7 @@ const LicensesView = ({ licenses, onRefresh }: { licenses: any[]; onRefresh: () 
   const [genCount, setGenCount] = useState("5");
   const [genDays, setGenDays] = useState("30");
   const [genLevel, setGenLevel] = useState("1");
+  const [genPrefix, setGenPrefix] = useState("KEYAUTH");
 
   const filtered = licenses.filter(l => {
     if (filter === "USED" && l.status !== "Used") return false;
@@ -312,7 +313,7 @@ const LicensesView = ({ licenses, onRefresh }: { licenses: any[]; onRefresh: () 
   };
 
   const handleGenerate = async () => {
-    await api.generateLicenses(O(), S(), { count: parseInt(genCount) || 5, durationDays: parseInt(genDays) || 30, subLevel: parseInt(genLevel) || 1 });
+    await api.generateLicenses(O(), S(), { count: parseInt(genCount) || 5, durationDays: parseInt(genDays) || 30, subLevel: parseInt(genLevel) || 1, prefix: genPrefix || undefined });
     setShowGen(false);
     onRefresh();
   };
@@ -333,6 +334,7 @@ const LicensesView = ({ licenses, onRefresh }: { licenses: any[]; onRefresh: () 
         <div className="mb-5 rounded-xl border border-blue-500/30 bg-blue-500/5 p-4">
           <h3 className="mb-3 text-sm font-bold text-white">Generate Licenses</h3>
           <div className="flex flex-wrap items-end gap-3">
+            <div><label className="mb-1 block text-[10px] uppercase tracking-widest text-zinc-500">Prefix</label><Input value={genPrefix} onChange={setGenPrefix} className="w-32" /></div>
             <div><label className="mb-1 block text-[10px] uppercase tracking-widest text-zinc-500">Count</label><Input value={genCount} onChange={setGenCount} className="w-20" /></div>
             <div><label className="mb-1 block text-[10px] uppercase tracking-widest text-zinc-500">Duration (days)</label><Input value={genDays} onChange={setGenDays} className="w-28" /></div>
             <div><label className="mb-1 block text-[10px] uppercase tracking-widest text-zinc-500">Sub Level</label><Input value={genLevel} onChange={setGenLevel} className="w-20" /></div>

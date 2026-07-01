@@ -14,8 +14,8 @@ export const comparePassword = async (password: string, hash: string): Promise<b
   return bcrypt.compare(password, hash);
 };
 
-export const generateLicenseKey = (): string => {
-  const prefix = 'KEYAUTH';
+export const generateLicenseKey = (prefix: string = 'KEYAUTH'): string => {
+  const safePrefix = prefix.replace(/[^A-Za-z0-9]/g, '').toUpperCase() || 'KEYAUTH';
   const randomPart = crypto.randomBytes(4).toString('hex').toUpperCase();
-  return `${prefix}-${randomPart}`;
+  return `${safePrefix}-${randomPart}`;
 };

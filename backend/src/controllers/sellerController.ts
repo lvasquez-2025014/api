@@ -97,7 +97,7 @@ export const deleteApp = async (req: Request, res: Response) => {
 };
 
 export const generateLicenses = async (req: AuthRequest, res: Response) => {
-  const { count, durationDays, subLevel } = req.body;
+  const { count, durationDays, subLevel, prefix } = req.body;
   const app = req.authApp;
   if (!app) return res.status(401).json({ message: 'Application not authenticated.' });
   if (!count || !durationDays || !subLevel) {
@@ -107,7 +107,7 @@ export const generateLicenses = async (req: AuthRequest, res: Response) => {
   const generated = [];
   for (let i = 0; i < count; i++) {
     const newLicense = await LicenseModel.create({
-      key: generateLicenseKey(),
+      key: generateLicenseKey(prefix),
       durationDays,
       status: 'Not Used',
       subLevel,

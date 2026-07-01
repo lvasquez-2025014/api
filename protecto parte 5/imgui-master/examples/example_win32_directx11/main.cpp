@@ -1,9 +1,9 @@
 ﻿#include "main.h"
 
 using namespace KeyAuth;
-std::string name = "asmodeus"; 
-std::string ownerid = "1739a61d38"; 
-std::string secret = "fb34d5e2f20122d2583f9d5cfbf5d7975269ab30c763b13b3a974d819b5480d1"; 
+std::string name = "Supreme Cheat"; 
+std::string ownerid = "04ad684f0a"; 
+std::string secret = "b8cc459de7d3259bf19ae0a2888f284072f4eb3e7db5194a62be100429e165ed"; 
 std::string version = "1.0"; 
 
 api KeyAuthApp(name, ownerid, secret, version);
@@ -903,7 +903,7 @@ int maindll()
         }
 
 
-        //Me la pelan 3000
+        
 
         // Rendering
         ImGui::Render();

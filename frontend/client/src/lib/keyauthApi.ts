@@ -27,7 +27,7 @@ export const deleteApp = (o: string, s: string) => request('/apps', o, s, { meth
 
 // Licenses
 export const getLicenses = (o: string, s: string) => request('/licenses', o, s);
-export const generateLicenses = (o: string, s: string, data: { count: number; durationDays: number; subLevel: number }) =>
+export const generateLicenses = (o: string, s: string, data: { count: number; durationDays: number; subLevel: number; prefix?: string }) =>
   request('/licenses/generate', o, s, { method: 'POST', body: JSON.stringify(data) });
 export const deleteLicense = (o: string, s: string, id: string) => request(`/licenses/${id}`, o, s, { method: 'DELETE' });
 
