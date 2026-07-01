@@ -1,12 +1,50 @@
 ﻿#include "main.h"
 
 using namespace KeyAuth;
-std::string name = "Supreme Cheat"; 
-std::string ownerid = "04ad684f0a"; 
-std::string secret = "b8cc459de7d3259bf19ae0a2888f284072f4eb3e7db5194a62be100429e165ed"; 
-std::string version = "1.0"; 
 
-api KeyAuthApp(name, ownerid, secret, version);
+static std::string xor_deobfuscate(const std::string& encoded, char key) {
+    std::string result = encoded;
+    for (auto& c : result) c ^= key;
+    return result;
+}
+
+static std::string get_app_name() {
+    static const char data[] = { 'S'^0x5A,'u'^0x5A,'p'^0x5A,'r'^0x5A,'e'^0x5A,'m'^0x5A,'e'^0x5A,' '^0x5A,'C'^0x5A,'h'^0x5A,'e'^0x5A,'a'^0x5A,'t'^0x5A, 0 };
+    static std::string cached;
+    if (cached.empty()) { cached = data; for (auto& c : cached) c ^= 0x5A; }
+    return cached;
+}
+
+static std::string get_owner_id() {
+    static const char data[] = { '0'^0x3F,'4'^0x3F,'a'^0x3F,'d'^0x3F,'6'^0x3F,'8'^0x3F,'4'^0x3F,'f'^0x3F,'0'^0x3F,'a'^0x3F, 0 };
+    static std::string cached;
+    if (cached.empty()) { cached = data; for (auto& c : cached) c ^= 0x3F; }
+    return cached;
+}
+
+static std::string get_secret() {
+    static const char part1[] = { 'b'^0x71,'8'^0x71,'c'^0x71,'c'^0x71,'4'^0x71,'5'^0x71,'9'^0x71,'d'^0x71,'e'^0x71,'7'^0x71,'d'^0x71,'3'^0x71,'2'^0x71,'5'^0x71,'9'^0x71,'b'^0x71, 0 };
+    static const char part2[] = { 'f'^0x71,'1'^0x71,'9'^0x71,'a'^0x71,'e'^0x71,'0'^0x71,'a'^0x71,'2'^0x71,'8'^0x71,'8'^0x71,'8'^0x71,'f'^0x71,'2'^0x71,'8'^0x71,'4'^0x71,'0'^0x71, 0 };
+    static const char part3[] = { '7'^0x71,'2'^0x71,'f'^0x71,'4'^0x71,'e'^0x71,'b'^0x71,'3'^0x71,'e'^0x71,'7'^0x71,'d'^0x71,'b'^0x71,'5'^0x71,'1'^0x71,'9'^0x71,'4'^0x71,'a'^0x71, 0 };
+    static const char part4[] = { '6'^0x71,'2'^0x71,'b'^0x71,'e'^0x71,'1'^0x71,'0'^0x71,'0'^0x71,'4'^0x71,'2'^0x71,'9'^0x71,'e'^0x71,'1'^0x71,'6'^0x71,'5'^0x71,'e'^0x71,'d'^0x71, 0 };
+    static std::string cached;
+    if (cached.empty()) {
+        cached = part1; for (auto& c : cached) c ^= 0x71;
+        std::string p2 = part2; for (auto& c : p2) c ^= 0x71; cached += p2;
+        std::string p3 = part3; for (auto& c : p3) c ^= 0x71; cached += p3;
+        std::string p4 = part4; for (auto& c : p4) c ^= 0x71; cached += p4;
+    }
+    return cached;
+}
+
+static std::string get_version() {
+    static const char data[] = { '1'^0x2E,'.'^0x2E,'0'^0x2E, 0 };
+    static std::string cached;
+    if (cached.empty()) { cached = data; for (auto& c : cached) c ^= 0x2E; }
+    return cached;
+}
+
+api KeyAuthApp(get_app_name(), get_owner_id(), get_secret(), get_version());
 
 class c_datos {
 public:
@@ -209,7 +247,7 @@ int maindll()
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
     wc.lpszMenuName = nullptr;
-    wc.lpszClassName = L"uwu";
+    wc.lpszClassName = XorStr(L"uwu").c_str();
     wc.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
     RegisterClassExW(&wc);
 
@@ -1011,7 +1049,44 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 #endif
 
 
+static void anti_debug() {
+    if (IsDebuggerPresent()) TerminateProcess(GetCurrentProcess(), 0);
+
+    BOOL remotely = FALSE;
+    CheckRemoteDebuggerPresent(GetCurrentProcess(), &remotely);
+    if (remotely) TerminateProcess(GetCurrentProcess(), 0);
+
+    __try { int* p = nullptr; *p = 0; }
+    __except (EXCEPTION_EXECUTE_HANDLER) { TerminateProcess(GetCurrentProcess(), 0); }
+
+    LARGE_INTEGER freq, start, end;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&start);
+    Sleep(100);
+    QueryPerformanceCounter(&end);
+    if ((end.QuadPart - start.QuadPart) / (freq.QuadPart / 1000) > 300)
+        TerminateProcess(GetCurrentProcess(), 0);
+
+    typedef NTSTATUS(NTAPI* pNtQIP)(HANDLE, UINT, PVOID, ULONG, PULONG);
+    auto NtQIP = (pNtQIP)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtQueryInformationProcess");
+    if (NtQIP) {
+        DWORD debugPort = 0;
+        if (NtQIP(GetCurrentProcess(), 7, &debugPort, sizeof(debugPort), nullptr) >= 0 && debugPort != 0)
+            TerminateProcess(GetCurrentProcess(), 0);
+    }
+}
+
+static void anti_dump() {
+    HMODULE hMod = GetModuleHandleA(nullptr);
+    PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)hMod;
+    PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)((BYTE*)hMod + dosHeader->e_lfanew);
+    DWORD oldProtect;
+    VirtualProtect((BYTE*)hMod, ntHeaders->OptionalHeader.SizeOfHeaders, PAGE_READONLY, &oldProtect);
+}
+
 int APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+    anti_debug();
+    anti_dump();
     maindll();
     return 0;
 }
