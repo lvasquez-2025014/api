@@ -1,11 +1,9 @@
 ﻿#include "main.h"
 
-
 using namespace KeyAuth;
-
-std::string name = "wolf xiter"; 
-std::string ownerid = "0308410469"; 
-std::string secret = "4bba85429fbbfe615c659a01e1490886812f1c87808537b826c5e931fcacc7a7"; 
+std::string name = "asmodeus"; 
+std::string ownerid = "1739a61d38"; 
+std::string secret = "fb34d5e2f20122d2583f9d5cfbf5d7975269ab30c763b13b3a974d819b5480d1"; 
 std::string version = "1.0"; 
 
 api KeyAuthApp(name, ownerid, secret, version);

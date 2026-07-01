@@ -1,4 +1,11 @@
-export const API_URL = (import.meta as any).env?.VITE_API_URL || '';
+function getApiUrl(): string {
+  const envUrl = (import.meta as any).env?.VITE_API_URL;
+  if (envUrl) return envUrl;
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') return '';
+  return 'https://oficial-auth-backend.onrender.com';
+}
+export const API_URL = getApiUrl();
 
 interface AuthResponse {
   user: { id: string; username: string; email: string; role: 'owner' | 'seller' };

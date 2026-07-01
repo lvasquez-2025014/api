@@ -32,9 +32,16 @@ const isProduction = process.env.NODE_ENV === 'production';
 app.use(helmet());
 
 app.use(cors({
-  origin: isProduction
-    ? [FRONTEND_URL, 'https://api-frontend-navy.vercel.app']
-    : ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000', 'http://127.0.0.1:5173'],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (!isProduction) {
+      if (origin.includes('localhost') || origin.includes('127.0.0.1')) return callback(null, true);
+    }
+    if (isProduction) {
+      if (origin === FRONTEND_URL || origin.includes('.vercel.app')) return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Owner-Id', 'X-Secret'],
   credentials: true,
